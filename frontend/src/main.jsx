@@ -7,7 +7,6 @@ import {
   Route,
   RouterProvider,
 } from 'react-router-dom';
-import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import HomeScreen from './Components/screens/HomeScreen.jsx';
 import ErrorBoundary from './Components/ErrorBoundary.jsx';

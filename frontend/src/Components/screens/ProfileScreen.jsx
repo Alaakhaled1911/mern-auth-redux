@@ -1,102 +1,180 @@
-import React from 'react'
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Form, Button, Row, Col } from "react-bootstrap";
-import FormContainer from "../FormContainer";
-import Loader from "../Loader";
-import {  useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { setCredentials } from "../../slices/authSlice";
-import { useUpdateUserMutation } from "../../slices/userApiSlice";
-const ProfileScreen = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [name, setName] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+"use client"
 
-  
-  const { userInfo } = useSelector((state) => state.auth);
-  const [updateUser, { isLoading }] = useUpdateUserMutation();
-    useEffect(() => {
-  setName(userInfo.name);
-  setEmail(userInfo.email);
-  }, [userInfo.name, userInfo.email]);
-  
-  
-    const submitHandler = async (e) => {
-      e.preventDefault();
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux"
+import { toast } from "react-toastify"
+import { setCredentials } from "../../slices/authSlice"
+import { useUpdateUserMutation } from "../../slices/userApiSlice"
+import { motion } from "framer-motion"
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiSave } from "react-icons/fi"
+import "./AuthStyles.css"
+
+const ProfileScreen = () => {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [name, setName] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const { userInfo } = useSelector((state) => state.auth)
+  const [updateUser, { isLoading }] = useUpdateUserMutation()
+
+  useEffect(() => {
+    setName(userInfo.name)
+    setEmail(userInfo.email)
+  }, [userInfo.name, userInfo.email])
+
+  const submitHandler = async (e) => {
+    e.preventDefault()
     if (password !== confirmPassword) {
-        toast.error("Passwords do not match");
-      } else {
-       try {
-          const res = await updateUser({
-            _id: userInfo._id,
-            name,
-            email,
-            password,
-          }).unwrap();
-          dispatch(setCredentials({ ...res }));
-          toast.success("Profile Updated");
-        } catch (err) {
-          toast.error(err?.data?.message  || err.error);
-        }
+      toast.error("Passwords do not match")
+    } else {
+      try {
+        const res = await updateUser({
+          _id: userInfo._id,
+          name,
+          email,
+          password,
+        }).unwrap()
+        dispatch(setCredentials({ ...res }))
+        toast.success("Profile Updated")
+      } catch (err) {
+        toast.error(err?.data?.message || err.error)
       }
-    };
+    }
+  }
+
   return (
-    <FormContainer>
-         <h1>Update Profile</h1>
-   
-         <Form onSubmit={submitHandler}>
-         <Form.Group className="my-2" controlId="name">
-             <Form.Label>Name</Form.Label>
-             <Form.Control
-               type="name"
-               placeholder="Enter name"
-               value={name}
-               onChange={(e) => setName(e.target.value)}
-             ></Form.Control>
-           </Form.Group>
-           <Form.Group className="my-2" controlId="email">
-             <Form.Label>Email Address</Form.Label>
-             <Form.Control
-               type="email"
-               placeholder="Enter email"
-               value={email}
-               onChange={(e) => setEmail(e.target.value)}
-             ></Form.Control>
-           </Form.Group>
-   
-           <Form.Group className="my-2" controlId="password">
-             <Form.Label>Password</Form.Label>
-             <Form.Control
-               type="password"
-               placeholder="Enter password"
-               value={password}
-               onChange={(e) => setPassword(e.target.value)}
-             ></Form.Control>
-           </Form.Group>
-   
-           <Form.Group className="my-2" controlId="confirmPassword">
-             <Form.Label>Confirm Password</Form.Label>
-             <Form.Control
-               type="password"
-               placeholder="Confirm password"
-               value={confirmPassword}
-               onChange={(e) => setConfirmPassword(e.target.value)}
-             ></Form.Control>
-           </Form.Group>
-         {isLoading && <Loader />}
-           <Button type="submit" variant="primary" className="mt-3">
-              Update Your Profile
-           </Button>
-         </Form>
-   
-   
-    
-       </FormContainer>
+    <div className="auth-container">
+      <motion.div
+        className="auth-card"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div
+          className="auth-header"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <h1>Your Profile</h1>
+          <p>Update your personal information</p>
+        </motion.div>
+
+        <form onSubmit={submitHandler} className="auth-form">
+          <motion.div
+            className="form-group"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <div className="input-icon-wrapper">
+              <FiUser className="input-icon" />
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="form-group"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
+            <div className="input-icon-wrapper">
+              <FiMail className="input-icon" />
+              <input
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="form-group"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <div className="input-icon-wrapper">
+              <FiLock className="input-icon" />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="New Password (leave blank to keep current)"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="form-group"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+          >
+            <div className="input-icon-wrapper">
+              <FiLock className="input-icon" />
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm New Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
+            </div>
+          </motion.div>
+
+          <motion.button
+            type="submit"
+            className="auth-button"
+            disabled={isLoading}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+          >
+            {isLoading ? (
+              <div className="loader-container">
+                <div className="spinner"></div>
+                <span>Updating profile...</span>
+              </div>
+            ) : (
+              <>
+                <FiSave className="button-icon" />
+                <span>Update Profile</span>
+              </>
+            )}
+          </motion.button>
+        </form>
+      </motion.div>
+    </div>
   )
 }
 
 export default ProfileScreen
+
